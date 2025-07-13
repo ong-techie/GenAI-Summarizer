@@ -1,0 +1,89 @@
+{
+    "info": {
+      "_postman_id": "a3f2ef43-abc1-4a5b-b79d-xyz987",
+      "name": "DocumentQA API (Gemini Flash)",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "description": "Postman collection for testing the DocumentQA FastAPI backend"
+    },
+    "item": [
+      {
+        "name": "Upload Document",
+        "request": {
+          "method": "POST",
+          "header": [],
+          "body": {
+            "mode": "formdata",
+            "formdata": [
+              {
+                "key": "file",
+                "type": "file",
+                "src": ""
+              }
+            ]
+          },
+          "url": {
+            "raw": "http://localhost:8000/upload/",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "8000",
+            "path": ["upload", ""]
+          }
+        }
+      },
+      {
+        "name": "Ask Anything",
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"question\": \"What is the main purpose of this document?\",\n  \"doc_id\": \"your_doc_id_here\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:8000/ask/",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "8000",
+            "path": ["ask", ""]
+          }
+        }
+      },
+      {
+        "name": "Get Challenge Questions",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:8000/challenge/your_doc_id_here",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "8000",
+            "path": ["challenge", "your_doc_id_here"]
+          }
+        }
+      },
+      {
+        "name": "Submit Challenge Answers",
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"doc_id\": \"your_doc_id_here\",\n  \"questions\": [\n    \"Question 1 text\",\n    \"Question 2 text\",\n    \"Question 3 text\"\n  ],\n  \"answers\": [\n    \"Answer 1\",\n    \"Answer 2\",\n    \"Answer 3\"\n  ]\n}"
+          },
+          "url": {
+            "raw": "http://localhost:8000/challenge/evaluate",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "8000",
+            "path": ["challenge", "evaluate"]
+          }
+        }
+      }
+    ]
+  }
+  
