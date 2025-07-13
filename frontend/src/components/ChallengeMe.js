@@ -32,7 +32,7 @@ const ChallengeMe = () => {
       <button onClick={startChallenge}>Start Challenge</button>
       {questions.map((q, idx) => (
         <div key={idx} className="qa-box">
-          <p><strong>Q{idx + 1}:</strong> {q}</p>
+          <p><strong>Q{idx + 1}:</strong> {q.replace(/^\d+\.\s*/, "")}</p>
           <input
             type="text"
             placeholder="Your answer"
