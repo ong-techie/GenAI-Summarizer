@@ -49,7 +49,9 @@ Questions:
 1.
 """
     response = MODEL.generate_content(prompt)
-    return [line.strip() for line in response.text.strip().split("\n") if line.strip()]
+    lines = response.text.strip().split("\n")
+    # Only include lines that look like "1. ...", "2. ..." etc.
+    return [line.strip() for line in lines if re.match(r"^\d+\.", line.strip())]
 
 
 
