@@ -17,3 +17,6 @@ app.add_middleware(
 app.include_router(upload.router, prefix="/upload", tags=["Upload"])
 app.include_router(ask.router, prefix="/ask", tags=["AskAnything"])
 app.include_router(challenge.router, prefix="/challenge", tags=["ChallengeMe"])
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
