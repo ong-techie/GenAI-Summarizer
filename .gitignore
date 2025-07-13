@@ -10,4 +10,4 @@ __pycache__/
 .vscode/
 
 # Node modules (for frontend)
-frontend/node_modules/
+node_modules
