@@ -13,7 +13,7 @@ MODEL = genai.GenerativeModel("models/gemini-2.5-flash-lite-preview-06-17")
 
 async def generate_summary(vectorstore, full_text):
     prompt = f"Summarize the following text in under 150 words:\n{full_text[:2000]}"
-    response = MODEL.generate_content(prompt)
+    response = MODEL.generate_content(prompt,generation_config={"user_id": "demo-user"})
     return response.text
 
 
@@ -32,7 +32,7 @@ Question:
 
 Answer:
 """
-    response = MODEL.generate_content(prompt)
+    response = MODEL.generate_content(prompt,generation_config={"user_id": "demo-user"})
     return re.sub(r"\*\*(.*?)\*\*", r"\1", response.text.strip())
 
 
@@ -48,7 +48,7 @@ Document:
 Questions:
 1.
 """
-    response = MODEL.generate_content(prompt)
+    response = MODEL.generate_content(prompt,generation_config={"user_id": "demo-user"})
     lines = response.text.strip().split("\n")
     # Only include lines that look like "1. ...", "2. ..." etc.
     return [line.strip() for line in lines if re.match(r"^\d+\.", line.strip())]
@@ -77,7 +77,7 @@ Answer:
 
 Evaluation:
 """
-        response = MODEL.generate_content(prompt)
+        response = MODEL.generate_content(prompt,generation_config={"user_id": "demo-user"})
         feedbacks.append(response.text.strip())
 
     return feedbacks
