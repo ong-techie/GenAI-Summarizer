@@ -8,5 +8,3 @@ __pycache__/
 
 # VS Code settings (optional)
 .vscode/
-
-# Node modules (for frontend)
