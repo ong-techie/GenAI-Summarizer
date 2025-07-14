@@ -22,7 +22,7 @@ async def answer_question(vectorstore, question: str):
     context = "\n".join(chunks)
 
     prompt = f"""
-You are a document question-answering assistant. Given the document below, answer the user's question in one or two sentences. Then, explain which part of the document justifies your answer in a separate line starting with "Justification:".
+You are a document question-answering assistant. Given the document below, answer the user's question in one or two sentences. Then, explain which page, line and part of the document justifies your answer in next line starting with Justification:.
 
 Document:
 {context}
@@ -64,7 +64,7 @@ async def evaluate_answers(vectorstore, questions, answers):
         context = "\n".join(context_docs)
 
         prompt = f"""
-Given the document below, evaluate the answer to the question. Say if it's correct or not and explain briefly with "Justification" from the document.
+Given the document below, evaluate the answer to the question. Say if it's correct or not and explain briefly with "Justification" about which page, line and part of the document explains the answer.
 
 Document:
 {context}
