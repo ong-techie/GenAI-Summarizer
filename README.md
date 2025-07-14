@@ -3,7 +3,7 @@
 An AI-powered document assistant that lets you upload PDF/TXT files, generates summaries, answers custom questions contextually, and tests comprehension with auto-generated challenges using **Gemini Flash 2.5**, **FastAPI**, and **React**.
 
 ## 🌐 Live Deployment
-[https://gen-ai-summarizer-fpi7ltl2x-ong-techies-projects.vercel.app](https://gen-ai-summarizer-fpi7ltl2x-ong-techies-projects.vercel.app)
+[https://gen-ai-summarizer-one.vercel.app](https://gen-ai-summarizer-one.vercel.app)
 
 
 ## 🧠 Features
