@@ -18,7 +18,8 @@ const UploadForm = () => {
     formData.append("file", file);
 
     try {
-      const res = await axios.post("https://genai-summarizer-1-bpn5.onrender.com/upload", formData);
+      const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+      const res = await axios.post(`${BASE_URL}/upload`, formData);
       setDocId(res.data.doc_id);
       setSummary(res.data.summary);
       setMessage("✅ Document uploaded successfully!");

@@ -9,14 +9,16 @@ const ChallengeMe = () => {
   const [feedback, setFeedback] = useState([]);
 
   const startChallenge = async () => {
-    const res = await axios.get(`https://genai-summarizer-1-bpn5.onrender.com/challenge/${docId}`);
+    const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    const res = await axios.get(`${BASE_URL}/challenge/${docId}`);
     setQuestions(res.data.questions);
     setAnswers(new Array(res.data.questions.length).fill(""));
     setFeedback([]);
   };
 
   const submitAnswers = async () => {
-    const res = await axios.post("https://genai-summarizer-1-bpn5.onrender.com/challenge/evaluate", {
+    const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    const res = await axios.post(`${BASE_URL}/challenge/evaluate`, {
       doc_id: docId,
       questions,
       answers

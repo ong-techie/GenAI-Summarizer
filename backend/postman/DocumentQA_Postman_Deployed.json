@@ -1,0 +1,110 @@
+{
+  "info": {
+    "_postman_id": "a3f2ef43-abc1-4a5b-b79d-xyz987",
+    "name": "DocumentQA API (Deployed)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for testing the DocumentQA FastAPI backend (deployed version)"
+  },
+  "item": [
+    {
+      "name": "Upload Document",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": ""
+            }
+          ]
+        },
+        "url": {
+          "raw": "https://genai-summarizer-1-bpn5.onrender.com/upload/",
+          "protocol": "https",
+          "host": [
+            "genai-summarizer-1-bpn5.onrender.com"
+          ],
+          "path": [
+            "upload",
+            ""
+          ]
+        }
+      }
+    },
+    {
+      "name": "Ask Anything",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question\": \"What is the main purpose of this document?\",\n  \"doc_id\": \"your_doc_id_here\"\n}"
+        },
+        "url": {
+          "raw": "https://genai-summarizer-1-bpn5.onrender.com/ask/",
+          "protocol": "https",
+          "host": [
+            "genai-summarizer-1-bpn5.onrender.com"
+          ],
+          "path": [
+            "ask",
+            ""
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Challenge Questions",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://genai-summarizer-1-bpn5.onrender.com/challenge/your_doc_id_here",
+          "protocol": "https",
+          "host": [
+            "genai-summarizer-1-bpn5.onrender.com"
+          ],
+          "path": [
+            "challenge",
+            "your_doc_id_here"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Submit Challenge Answers",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"doc_id\": \"your_doc_id_here\",\n  \"questions\": [\n    \"Question 1 text\",\n    \"Question 2 text\",\n    \"Question 3 text\"\n  ],\n  \"answers\": [\n    \"Answer 1\",\n    \"Answer 2\",\n    \"Answer 3\"\n  ]\n}"
+        },
+        "url": {
+          "raw": "https://genai-summarizer-1-bpn5.onrender.com/challenge/evaluate",
+          "protocol": "https",
+          "host": [
+            "genai-summarizer-1-bpn5.onrender.com"
+          ],
+          "path": [
+            "challenge",
+            "evaluate"
+          ]
+        }
+      }
+    }
+  ]
+}

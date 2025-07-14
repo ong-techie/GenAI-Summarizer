@@ -8,7 +8,9 @@ const AskAnything = () => {
   const [answer, setAnswer] = useState("");
 
   const ask = async () => {
-    const res = await axios.post("https://genai-summarizer-1-bpn5.onrender.com/ask", {
+    const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    const res = await axios.post(`${BASE_URL}/ask`, {
+
       doc_id: docId,
       question
     });
