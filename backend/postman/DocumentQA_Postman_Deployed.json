@@ -22,10 +22,10 @@
           ]
         },
         "url": {
-          "raw": "https://genai-summarizer-1-bpn5.onrender.com/upload/",
+          "raw": "https://genai-summarizer-2-i09j.onrender.com/upload/",
           "protocol": "https",
           "host": [
-            "genai-summarizer-1-bpn5.onrender.com"
+            "genai-summarizer-2-i09j.onrender.com"
           ],
           "path": [
             "upload",
@@ -49,10 +49,10 @@
           "raw": "{\n  \"question\": \"What is the main purpose of this document?\",\n  \"doc_id\": \"your_doc_id_here\"\n}"
         },
         "url": {
-          "raw": "https://genai-summarizer-1-bpn5.onrender.com/ask/",
+          "raw": "https://genai-summarizer-2-i09j.onrender.com/ask/",
           "protocol": "https",
           "host": [
-            "genai-summarizer-1-bpn5.onrender.com"
+            "genai-summarizer-2-i09j.onrender.com"
           ],
           "path": [
             "ask",
@@ -67,10 +67,10 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "https://genai-summarizer-1-bpn5.onrender.com/challenge/your_doc_id_here",
+          "raw": "https://genai-summarizer-2-i09j.onrender.com/challenge/your_doc_id_here",
           "protocol": "https",
           "host": [
-            "genai-summarizer-1-bpn5.onrender.com"
+            "genai-summarizer-2-i09j.onrender.com"
           ],
           "path": [
             "challenge",
@@ -94,10 +94,10 @@
           "raw": "{\n  \"doc_id\": \"your_doc_id_here\",\n  \"questions\": [\n    \"Question 1 text\",\n    \"Question 2 text\",\n    \"Question 3 text\"\n  ],\n  \"answers\": [\n    \"Answer 1\",\n    \"Answer 2\",\n    \"Answer 3\"\n  ]\n}"
         },
         "url": {
-          "raw": "https://genai-summarizer-1-bpn5.onrender.com/challenge/evaluate",
+          "raw": "https://genai-summarizer-2-i09j.onrender.com/challenge/evaluate",
           "protocol": "https",
           "host": [
-            "genai-summarizer-1-bpn5.onrender.com"
+            "genai-summarizer-2-i09j.onrender.com"
           ],
           "path": [
             "challenge",
