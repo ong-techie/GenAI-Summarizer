@@ -20,9 +20,13 @@ const UploadForm = () => {
     try {
       const BASE_URL = process.env.REACT_APP_API_BASE_URL;
       const res = await axios.post(`${BASE_URL}/upload`, formData);
-      setDocId(res.data.doc_id);
-      setSummary(res.data.summary);
-      setMessage("✅ Document uploaded successfully!");
+      if (res.data.doc_id && res.data.summary) {
+        setDocId(res.data.doc_id);
+        setSummary(res.data.summary);
+        setMessage("✅ Document uploaded successfully!");
+      } else {
+        setMessage("❌ Upload failed. Invalid server response.");
+      }
     } catch (error) {
       setMessage("❌ Upload failed. Please try again.");
       console.error("Upload error:", error);
