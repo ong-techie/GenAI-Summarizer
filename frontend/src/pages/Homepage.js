@@ -1,16 +1,17 @@
 import React from "react";
 import UploadForm from "../components/UploadForm";
-import AskAnything from "../components/AskAnything";
-import ChallengeMe from "../components/ChallengeMe";
+import Navbar from "../components/navbar";
 
 const HomePage = () => {
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Document QA Assistant</h1>
-      <UploadForm />
-      <AskAnything />
-      <ChallengeMe />
-    </div>
+    <>
+      <Navbar />
+      <div className="container">
+        <h1 className="main-title">📚 Document QA Assistant</h1>
+        <UploadForm />
+      </div>
+    </>
   );
 };
+
 export default HomePage;

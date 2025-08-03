@@ -8,26 +8,31 @@ const AskAnything = () => {
   const [answer, setAnswer] = useState("");
 
   const ask = async () => {
+    if (!question.trim()) return;
     const BASE_URL = process.env.REACT_APP_API_BASE_URL;
     const res = await axios.post(`${BASE_URL}/ask`, {
-
       doc_id: docId,
-      question
+      question,
     });
     setAnswer(res.data.answer);
   };
 
   return (
-    <div>
-      <h2>Ask Anything</h2>
+    <div className="card" id="ask">
+      <h2 className="main-title">💬 Ask Anything</h2>
       <input
         type="text"
-        placeholder="Your question"
+        placeholder="Type your question..."
         value={question}
         onChange={(e) => setQuestion(e.target.value)}
       />
       <button onClick={ask}>Ask</button>
-      {answer && <p><strong>Answer:</strong> {answer}</p>}
+      {answer && (
+        <div className="summary-box">
+          <strong>Answer:</strong>
+          <p>{answer}</p>
+        </div>
+      )}
     </div>
   );
 };

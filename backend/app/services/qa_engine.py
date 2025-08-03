@@ -35,23 +35,44 @@ Answer:
     response = MODEL.generate_content(prompt)
     return re.sub(r"\*\*(.*?)\*\*", r"\1", response.text.strip())
 
-
-async def generate_challenge_questions(vectorstore):
+async def generate_challenge_questions(vectorstore, n=3):
     docs = await retrieve_top_chunks(vectorstore, "main points", top_k=6)
     context = "\n".join(docs)
+
     prompt = f"""
-Based on the following document, generate only 3 logic-based questions.
+You are a highly skilled question generator.
+
+Given the document below, generate exactly {n} logic-based comprehension questions. These should test understanding, reasoning, and interpretation — not surface-level recall.
+
+Requirements:
+- Format your response as a numbered list:
+  1. First question
+  2. Second question
+  ...
+  {n}. Final question
+- Do NOT include answers, summaries, or explanations
+- Each question must be relevant to the document
 
 Document:
+---
 {context}
+---
 
+Now generate the {n} questions below:
 Questions:
-1.
 """
+
     response = MODEL.generate_content(prompt)
     lines = response.text.strip().split("\n")
-    # Only include lines that look like "1. ...", "2. ..." etc.
-    return [line.strip() for line in lines if re.match(r"^\d+\.", line.strip())]
+
+    # Extract and clean numbered questions like "1. ..."
+    questions = [
+        re.sub(r"^\d+\.\s*", "", line.strip())
+        for line in lines
+        if re.match(r"^\d+\.", line.strip())
+    ]
+
+    return questions[:n]
 
 
 

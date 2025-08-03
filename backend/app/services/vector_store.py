@@ -33,18 +33,40 @@ async def get_gemini_embeddings(texts: list[str]) -> list[list[float]]:
 
 
 async def build_vectorstore(doc_id: str, text: str):
+    print(f"[DEBUG] Starting build_vectorstore for doc_id: {doc_id}")
+
     chunks = split_text(text)
+    print(f"[DEBUG] Split text into {len(chunks)} chunks")
+
+    if not chunks:
+        print("[ERROR] No chunks generated — check split_text() or empty document.")
+        return
+
     embeddings = await get_gemini_embeddings(chunks)
-    
+    print(f"[DEBUG] Retrieved {len(embeddings)} embeddings")
+
+    if not embeddings or len(embeddings[0]) == 0:
+        print("[ERROR] Embedding generation failed or returned empty vectors")
+        return
+
     dim = len(embeddings[0])
     index = faiss.IndexFlatL2(dim)
     index.add(np.array(embeddings).astype("float32"))
 
-    faiss.write_index(index, os.path.join(VECTOR_DIR, f"{doc_id}.index"))
-    with open(os.path.join(VECTOR_DIR, f"{doc_id}_meta.pkl"), "wb") as f:
+    # Write FAISS index
+    index_path = os.path.join(VECTOR_DIR, f"{doc_id}.index")
+    meta_path = os.path.join(VECTOR_DIR, f"{doc_id}_meta.pkl")
+
+    print(f"[DEBUG] Writing FAISS index to {index_path}")
+    faiss.write_index(index, index_path)
+
+    print(f"[DEBUG] Writing metadata to {meta_path}")
+    with open(meta_path, "wb") as f:
         pickle.dump(chunks, f)
 
+    print(f"[SUCCESS] Vectorstore created for doc_id: {doc_id}")
     return { "chunks": chunks, "index": index }
+
 
 
 async def load_vectorstore(doc_id: str):

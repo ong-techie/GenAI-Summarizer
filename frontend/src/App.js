@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/Homepage";
+import InteractPage from "./pages/InteractPage"; // new import
 import "./index.css";
 
 const App = () => {
@@ -8,6 +9,7 @@ const App = () => {
     <div className="app">
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/interact" element={<InteractPage />} /> {/* new route */}
       </Routes>
     </div>
   );
