@@ -1,28 +1,47 @@
-import google.generativeai as genai
-from dotenv import load_dotenv
-import os
 import re
-from app.services.vector_store import retrieve_top_chunks
-
 import google.generativeai as genai
+
+from app.services.vector_store import retrieve_top_chunks
 from app.core.config import GOOGLE_API_KEY, GEMINI_TEXT_MODEL
 
+# Configure Gemini once
 genai.configure(api_key=GOOGLE_API_KEY)
 MODEL = genai.GenerativeModel(GEMINI_TEXT_MODEL)
 
 
-async def generate_summary(vectorstore, full_text):
-    prompt = f"Summarize the following text in under 150 words:\n{full_text[:2000]}"
-    response = MODEL.generate_content(prompt)
-    return response.text
+async def generate_summary(vectorstore, full_text: str):
+    if not full_text or not full_text.strip():
+        return "No extractable text found in the document."
+
+    prompt = (
+        "Summarize the following text in under 150 words:\n\n"
+        f"{full_text[:2000]}"
+    )
+
+    try:
+        response = MODEL.generate_content(prompt)
+        return response.text.strip()
+    except Exception as e:
+        return f"Summary generation failed: {e}"
 
 
 async def answer_question(vectorstore, question: str):
     chunks = await retrieve_top_chunks(vectorstore, question)
+
+    if not chunks:
+        return (
+            "Answer: Unable to find relevant information.\n"
+            "Justification: The document does not contain relevant context."
+        )
+
     context = "\n".join(chunks)
 
     prompt = f"""
-You are a document question-answering assistant. Given the document below, answer the user's question in one or two sentences. Then, explain which page, line and part of the document justifies your answer in next line starting with Justification:.
+You are a document question-answering assistant.
+
+Answer the question in one or two sentences.
+Then add a second line starting with "Justification:" explaining
+which part of the document supports the answer.
 
 Document:
 {context}
@@ -32,60 +51,76 @@ Question:
 
 Answer:
 """
-    response = MODEL.generate_content(prompt)
-    return re.sub(r"\*\*(.*?)\*\*", r"\1", response.text.strip())
 
-async def generate_challenge_questions(vectorstore, n=3):
+    try:
+        response = MODEL.generate_content(prompt)
+        return re.sub(r"\*\*(.*?)\*\*", r"\1", response.text.strip())
+    except Exception as e:
+        return f"Answer generation failed: {e}"
+
+
+async def generate_challenge_questions(vectorstore, n: int = 3):
     docs = await retrieve_top_chunks(vectorstore, "main points", top_k=6)
+
+    if not docs:
+        return []
+
     context = "\n".join(docs)
 
     prompt = f"""
 You are a highly skilled question generator.
 
-Given the document below, generate exactly {n} logic-based comprehension questions. These should test understanding, reasoning, and interpretation — not surface-level recall.
+Generate exactly {n} logic-based comprehension questions
+that test reasoning and understanding.
 
-Requirements:
-- Format your response as a numbered list:
-  1. First question
-  2. Second question
-  ...
-  {n}. Final question
-- Do NOT include answers, summaries, or explanations
-- Each question must be relevant to the document
+Rules:
+- Numbered list only
+- No answers or explanations
 
 Document:
 ---
 {context}
 ---
 
-Now generate the {n} questions below:
 Questions:
 """
 
-    response = MODEL.generate_content(prompt)
-    lines = response.text.strip().split("\n")
+    try:
+        response = MODEL.generate_content(prompt)
+        lines = response.text.strip().split("\n")
 
-    # Extract and clean numbered questions like "1. ..."
-    questions = [
-        re.sub(r"^\d+\.\s*", "", line.strip())
-        for line in lines
-        if re.match(r"^\d+\.", line.strip())
-    ]
+        questions = [
+            re.sub(r"^\d+\.\s*", "", line.strip())
+            for line in lines
+            if re.match(r"^\d+\.", line.strip())
+        ]
 
-    return questions[:n]
+        return questions[:n]
 
+    except Exception as e:
+        print(f"[QUESTION GEN ERROR] {e}")
+        return []
 
 
 async def evaluate_answers(vectorstore, questions, answers):
     feedbacks = []
+
     for question, answer in zip(questions, answers):
         if not question.strip():
             continue
+
         context_docs = await retrieve_top_chunks(vectorstore, question, top_k=4)
+        if not context_docs:
+            feedbacks.append("Unable to evaluate: no relevant context found.")
+            continue
+
         context = "\n".join(context_docs)
 
         prompt = f"""
-Given the document below, evaluate the answer to the question. Say if it's correct or not and explain briefly with "Justification" about which page, line and part of the document explains the answer.
+Evaluate the answer to the question using the document.
+
+State whether it is correct or incorrect and explain briefly.
+Include a line starting with "Justification:".
 
 Document:
 {context}
@@ -98,7 +133,11 @@ Answer:
 
 Evaluation:
 """
-        response = MODEL.generate_content(prompt)
-        feedbacks.append(response.text.strip())
+
+        try:
+            response = MODEL.generate_content(prompt)
+            feedbacks.append(response.text.strip())
+        except Exception as e:
+            feedbacks.append(f"Evaluation failed: {e}")
 
     return feedbacks
