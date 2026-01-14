@@ -5,7 +5,7 @@ import re
 from app.services.vector_store import retrieve_top_chunks
 
 import google.generativeai as genai
-from app.config import GOOGLE_API_KEY, GEMINI_TEXT_MODEL
+from app.core.config import GOOGLE_API_KEY, GEMINI_TEXT_MODEL
 
 genai.configure(api_key=GOOGLE_API_KEY)
 MODEL = genai.GenerativeModel(GEMINI_TEXT_MODEL)

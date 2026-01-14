@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from app.services.text_splitter import split_text
 
 load_dotenv()
-from app.config import GOOGLE_API_KEY, GEMINI_EMBED_MODEL
+from app.core.config import GOOGLE_API_KEY, GEMINI_EMBED_MODEL
 genai.configure(api_key=GOOGLE_API_KEY)
 model=GEMINI_EMBED_MODEL
 
