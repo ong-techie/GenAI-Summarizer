@@ -7,7 +7,10 @@ from dotenv import load_dotenv
 from app.services.text_splitter import split_text
 
 load_dotenv()
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+from app.config import GOOGLE_API_KEY, GEMINI_EMBED_MODEL
+genai.configure(api_key=GOOGLE_API_KEY)
+model=GEMINI_EMBED_MODEL
+
 
 UPLOAD_DIR = "uploads"
 VECTOR_DIR = "vectors"

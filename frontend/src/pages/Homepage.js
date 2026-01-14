@@ -1,6 +1,6 @@
 import React from "react";
 import UploadForm from "../components/UploadForm";
-import Navbar from "../components/navbar";
+import Navbar from "../components/Navbar";
 
 const HomePage = () => {
   return (

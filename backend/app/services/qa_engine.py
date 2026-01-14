@@ -4,12 +4,12 @@ import os
 import re
 from app.services.vector_store import retrieve_top_chunks
 
-load_dotenv()
+import google.generativeai as genai
+from app.config import GOOGLE_API_KEY, GEMINI_TEXT_MODEL
 
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+genai.configure(api_key=GOOGLE_API_KEY)
+MODEL = genai.GenerativeModel(GEMINI_TEXT_MODEL)
 
-
-MODEL = genai.GenerativeModel("models/gemini-2.5-flash-lite-preview-06-17")
 
 async def generate_summary(vectorstore, full_text):
     prompt = f"Summarize the following text in under 150 words:\n{full_text[:2000]}"

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AskAnything from "../components/AskAnything";
 import ChallengeMe from "../components/ChallengeMe";
-import Navbar from "../components/navbar";
+import Navbar from "../components/Navbar";
 import { useDoc } from "../shared/DocContext";
 
 const InteractPage = () => {
