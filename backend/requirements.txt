@@ -9,3 +9,4 @@ PyMuPDF
 numpy
 aiofiles
 python-multipart
+openai>=1.12.0
