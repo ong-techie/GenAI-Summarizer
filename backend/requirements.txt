@@ -2,11 +2,14 @@ fastapi
 uvicorn
 pydantic
 python-dotenv
+
 google-generativeai
-sentence-transformers
+
 faiss-cpu
-PyMuPDF
 numpy
+
+PyMuPDF
 aiofiles
 python-multipart
+
 openai>=1.12.0
