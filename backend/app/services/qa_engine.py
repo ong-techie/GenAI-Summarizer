@@ -9,7 +9,7 @@ genai.configure(api_key=GOOGLE_API_KEY)
 MODEL = genai.GenerativeModel(GEMINI_TEXT_MODEL)
 
 
-async def generate_summary(vectorstore, full_text: str):
+async def generate_summary(full_text: str):
     if not full_text or not full_text.strip():
         return "No extractable text found in the document."
 
@@ -20,6 +20,8 @@ async def generate_summary(vectorstore, full_text: str):
 
     try:
         response = MODEL.generate_content(prompt)
+        if not hasattr(response, 'text') or not response.text:
+            return "Summary generation failed: No text in response"
         return response.text.strip()
     except Exception as e:
         return f"Summary generation failed: {e}"
@@ -54,6 +56,8 @@ Answer:
 
     try:
         response = MODEL.generate_content(prompt)
+        if not hasattr(response, 'text') or not response.text:
+            return "Answer generation failed: No text in response"
         return re.sub(r"\*\*(.*?)\*\*", r"\1", response.text.strip())
     except Exception as e:
         return f"Answer generation failed: {e}"
@@ -87,6 +91,10 @@ Questions:
 
     try:
         response = MODEL.generate_content(prompt)
+        if not hasattr(response, 'text') or not response.text:
+            print(f"[QUESTION GEN ERROR] No text in response")
+            return []
+        
         lines = response.text.strip().split("\n")
 
         questions = [
@@ -136,7 +144,10 @@ Evaluation:
 
         try:
             response = MODEL.generate_content(prompt)
-            feedbacks.append(response.text.strip())
+            if not hasattr(response, 'text') or not response.text:
+                feedbacks.append("Evaluation failed: No text in response")
+            else:
+                feedbacks.append(response.text.strip())
         except Exception as e:
             feedbacks.append(f"Evaluation failed: {e}")
 

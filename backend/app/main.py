@@ -5,9 +5,10 @@ from app.api.endpoints import upload, ask, challenge, root
 
 app = FastAPI()
 
+# CORS configuration - restrict origins in production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # TODO: Replace with specific origins in production (e.g., ["http://localhost:3000"])
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

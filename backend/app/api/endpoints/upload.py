@@ -29,7 +29,7 @@ async def upload_doc(file: UploadFile = File(...)):
 
     # 3️⃣ Generate summary
     try:
-        summary = await generate_summary(vectorstore, text)
+        summary = await generate_summary(text)
     except Exception as e:
         raise HTTPException(
             status_code=500,
