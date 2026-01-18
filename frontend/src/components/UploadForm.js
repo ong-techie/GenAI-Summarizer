@@ -28,6 +28,11 @@ const UploadForm = () => {
       setSummary("");
 
       const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+      if (!BASE_URL) {
+        setMessage("❌ API URL not configured. Please set REACT_APP_API_BASE_URL.");
+        return;
+      }
+
       const res = await axios.post(`${BASE_URL}/upload`, formData);
 
       if (res.data.doc_id && res.data.summary) {
@@ -41,7 +46,8 @@ const UploadForm = () => {
         setMessage("❌ Upload failed. Invalid server response.");
       }
     } catch (error) {
-      setMessage("❌ Upload failed. Please try again.");
+      const errorMsg = error.response?.data?.detail || error.message || "Upload failed. Please try again.";
+      setMessage(`❌ ${errorMsg}`);
       console.error("Upload error:", error);
     } finally {
       setUploading(false);

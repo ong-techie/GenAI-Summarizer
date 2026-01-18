@@ -8,29 +8,57 @@ const ChallengeMe = () => {
   const [answers, setAnswers] = useState(["", "", ""]);
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   const fetchQuestions = async () => {
-    if (!docId) return;
+    if (!docId) {
+      setError("No document ID found. Please upload a document first.");
+      return;
+    }
+
+    const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    if (!BASE_URL) {
+      setError("API URL not configured. Please set REACT_APP_API_BASE_URL.");
+      return;
+    }
 
     setLoading(true);
+    setError("");
     setQuestions([]);
     setFeedbacks([]);
     setAnswers(["", "", ""]);
 
     try {
-      const BASE_URL = process.env.REACT_APP_API_BASE_URL;
       const res = await axios.get(`${BASE_URL}/challenge/${docId}`);
       setQuestions(res.data.questions || []);
+      if (!res.data.questions || res.data.questions.length === 0) {
+        setError("No questions could be generated for this document.");
+      }
     } catch (err) {
       console.error("Error fetching questions:", err);
+      setError(err.response?.data?.detail || "Failed to generate questions. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   const submitAnswers = async () => {
+    if (!docId) {
+      setError("No document ID found. Please upload a document first.");
+      return;
+    }
+
+    const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    if (!BASE_URL) {
+      setError("API URL not configured. Please set REACT_APP_API_BASE_URL.");
+      return;
+    }
+
+    setSubmitting(true);
+    setError("");
+
     try {
-      const BASE_URL = process.env.REACT_APP_API_BASE_URL;
       const res = await axios.post(`${BASE_URL}/challenge/evaluate`, {
         doc_id: docId,
         questions,
@@ -39,6 +67,9 @@ const ChallengeMe = () => {
       setFeedbacks(res.data.feedbacks || []);
     } catch (err) {
       console.error("Error submitting answers:", err);
+      setError(err.response?.data?.detail || "Failed to submit answers. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -67,11 +98,13 @@ const ChallengeMe = () => {
               <p className="feedback">Feedback: {feedbacks[idx]}</p>
             )}
           </div>
-          
           ))}
-          <button onClick={submitAnswers}>Submit Answers</button>
+          <button onClick={submitAnswers} disabled={submitting}>
+            {submitting ? "Submitting..." : "Submit Answers"}
+          </button>
         </div>
       )}
+      {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
     </div>
   );
 };
