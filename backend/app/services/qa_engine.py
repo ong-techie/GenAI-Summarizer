@@ -1,12 +1,11 @@
 import re
-import google.generativeai as genai
+from google import genai
 
 from app.services.vector_store import retrieve_top_chunks
 from app.core.config import GOOGLE_API_KEY, GEMINI_TEXT_MODEL
 
-# Configure Gemini once
-genai.configure(api_key=GOOGLE_API_KEY)
-MODEL = genai.GenerativeModel(GEMINI_TEXT_MODEL)
+# ✅ Create Gemini client once
+client = genai.Client(api_key=GOOGLE_API_KEY)
 
 
 async def generate_summary(full_text: str):
@@ -19,9 +18,10 @@ async def generate_summary(full_text: str):
     )
 
     try:
-        response = MODEL.generate_content(prompt)
-        if not hasattr(response, 'text') or not response.text:
-            return "Summary generation failed: No text in response"
+        response = client.models.generate_content(
+            model=GEMINI_TEXT_MODEL,
+            contents=prompt,
+        )
         return response.text.strip()
     except Exception as e:
         return f"Summary generation failed: {e}"
@@ -55,9 +55,10 @@ Answer:
 """
 
     try:
-        response = MODEL.generate_content(prompt)
-        if not hasattr(response, 'text') or not response.text:
-            return "Answer generation failed: No text in response"
+        response = client.models.generate_content(
+            model=GEMINI_TEXT_MODEL,
+            contents=prompt,
+        )
         return re.sub(r"\*\*(.*?)\*\*", r"\1", response.text.strip())
     except Exception as e:
         return f"Answer generation failed: {e}"
@@ -90,13 +91,12 @@ Questions:
 """
 
     try:
-        response = MODEL.generate_content(prompt)
-        if not hasattr(response, 'text') or not response.text:
-            print(f"[QUESTION GEN ERROR] No text in response")
-            return []
-        
-        lines = response.text.strip().split("\n")
+        response = client.models.generate_content(
+            model=GEMINI_TEXT_MODEL,
+            contents=prompt,
+        )
 
+        lines = response.text.strip().split("\n")
         questions = [
             re.sub(r"^\d+\.\s*", "", line.strip())
             for line in lines
@@ -143,11 +143,11 @@ Evaluation:
 """
 
         try:
-            response = MODEL.generate_content(prompt)
-            if not hasattr(response, 'text') or not response.text:
-                feedbacks.append("Evaluation failed: No text in response")
-            else:
-                feedbacks.append(response.text.strip())
+            response = client.models.generate_content(
+                model=GEMINI_TEXT_MODEL,
+                contents=prompt,
+            )
+            feedbacks.append(response.text.strip())
         except Exception as e:
             feedbacks.append(f"Evaluation failed: {e}")
 

@@ -5,7 +5,7 @@ uvicorn
 pydantic
 python-dotenv
 
-google-generativeai
+google-genai
 
 torch==2.5.1+cpu
 sentence-transformers==2.2.2
