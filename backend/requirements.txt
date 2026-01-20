@@ -9,9 +9,12 @@ google-generativeai
 
 torch==2.5.1+cpu
 sentence-transformers==2.2.2
+huggingface_hub==0.16.4
+
 faiss-cpu
 numpy
 
 PyMuPDF
 aiofiles
 python-multipart
+
