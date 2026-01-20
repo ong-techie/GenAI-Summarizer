@@ -2,66 +2,59 @@ import os
 import pickle
 import faiss
 import numpy as np
-from openai import OpenAI
+from sentence_transformers import SentenceTransformer
 
 from app.services.text_splitter import split_text
-from app.core.config import OPENAI_API_KEY, OPENAI_EMBED_MODEL
 
-client = OpenAI(api_key=OPENAI_API_KEY)
-
+UPLOAD_DIR = "uploads"
 VECTOR_DIR = "vectors"
 os.makedirs(VECTOR_DIR, exist_ok=True)
 
+# ✅ Load local embedding model once
+embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
-async def get_openai_embeddings(texts: list[str]) -> list[list[float]]:
-    if not texts:
-        raise ValueError("Texts list cannot be empty")
-    
-    response = client.embeddings.create(
-        model=OPENAI_EMBED_MODEL,
-        input=texts
+
+def get_local_embeddings(texts: list[str]) -> np.ndarray:
+    return embedding_model.encode(
+        texts,
+        show_progress_bar=False,
+        convert_to_numpy=True
     )
-    
-    if not response.data or len(response.data) == 0:
-        raise ValueError("No embeddings returned from OpenAI API")
-    
-    return [item.embedding for item in response.data]
 
 
 async def build_vectorstore(doc_id: str, text: str):
+    print(f"[DEBUG] Building vectorstore for doc_id: {doc_id}")
+
     chunks = split_text(text)
+    print(f"[DEBUG] Split text into {len(chunks)} chunks")
 
     if not chunks:
-        raise ValueError(
-            "No extractable text found. "
-            "Scanned PDFs or empty documents are not supported."
-        )
+        raise ValueError("No extractable text found in document")
 
-    embeddings = await get_openai_embeddings(chunks)
-    
-    if not embeddings or len(embeddings) == 0:
-        raise ValueError("Failed to generate embeddings for document chunks")
-    
-    if len(embeddings[0]) == 0:
-        raise ValueError("Embedding dimension is zero - invalid embeddings")
+    embeddings = get_local_embeddings(chunks)
+    print(f"[DEBUG] Generated embeddings shape: {embeddings.shape}")
 
-    dim = len(embeddings[0])
+    dim = embeddings.shape[1]
     index = faiss.IndexFlatL2(dim)
-    index.add(np.array(embeddings).astype("float32"))
+    index.add(embeddings.astype("float32"))
 
-    faiss.write_index(index, f"{VECTOR_DIR}/{doc_id}.index")
-    with open(f"{VECTOR_DIR}/{doc_id}_meta.pkl", "wb") as f:
+    index_path = os.path.join(VECTOR_DIR, f"{doc_id}.index")
+    meta_path = os.path.join(VECTOR_DIR, f"{doc_id}_meta.pkl")
+
+    faiss.write_index(index, index_path)
+    with open(meta_path, "wb") as f:
         pickle.dump(chunks, f)
 
+    print(f"[SUCCESS] Vectorstore created for doc_id: {doc_id}")
     return {"chunks": chunks, "index": index}
 
 
 async def load_vectorstore(doc_id: str):
-    index_path = f"{VECTOR_DIR}/{doc_id}.index"
-    meta_path = f"{VECTOR_DIR}/{doc_id}_meta.pkl"
+    index_path = os.path.join(VECTOR_DIR, f"{doc_id}.index")
+    meta_path = os.path.join(VECTOR_DIR, f"{doc_id}_meta.pkl")
 
-    if not os.path.exists(index_path) or not os.path.exists(meta_path):
-        raise FileNotFoundError(f"Vectorstore not found for doc_id: {doc_id}")
+    if not os.path.exists(index_path):
+        raise FileNotFoundError("Vector index not found")
 
     index = faiss.read_index(index_path)
     with open(meta_path, "rb") as f:
@@ -71,28 +64,12 @@ async def load_vectorstore(doc_id: str):
 
 
 async def retrieve_top_chunks(vectorstore, query: str, top_k=4):
-    if not query or not query.strip():
-        raise ValueError("Query cannot be empty")
-    
-    if not vectorstore or "index" not in vectorstore or "chunks" not in vectorstore:
-        raise ValueError("Invalid vectorstore provided")
-    
-    response = client.embeddings.create(
-        model=OPENAI_EMBED_MODEL,
-        input=query
-    )
+    chunks = vectorstore["chunks"]
+    index = vectorstore["index"]
 
-    if not response.data or len(response.data) == 0:
-        raise ValueError("No embedding returned for query")
-    
-    query_vector = np.array(
-        [response.data[0].embedding]
-    ).astype("float32")
+    query_embedding = get_local_embeddings([query])[0]
+    query_vector = np.array([query_embedding]).astype("float32")
 
-    if vectorstore["index"].ntotal == 0:
-        return []
+    _, indices = index.search(query_vector, top_k)
 
-    _, indices = vectorstore["index"].search(query_vector, top_k)
-    # Handle case where search returns fewer results than requested
-    valid_indices = [i for i in indices[0] if i < len(vectorstore["chunks"])]
-    return [vectorstore["chunks"][i] for i in valid_indices]
+    return [chunks[i] for i in indices[0] if i < len(chunks)]
