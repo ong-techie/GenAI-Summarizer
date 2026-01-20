@@ -7,7 +7,7 @@ python-dotenv
 
 google-generativeai
 
-torch==2.1.2+cpu
+torch==2.5.1+cpu
 sentence-transformers==2.2.2
 faiss-cpu
 numpy
